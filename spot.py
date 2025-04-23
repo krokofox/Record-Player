@@ -9,9 +9,9 @@ from spotipy.oauth2 import SpotifyOAuth
 # token = token_dict['access_token'] 
 # spotifyObject = spotipy.Spotify(auth=token) 
 # user_name = spotifyObject.current_user() 
-username = 'kcoda36'
-clientID = 'c0e306fda7564575b2b8173ad25de008'
-clientSecret = '0931a81a50244acf8aa230ff2d968b3e'
+username = ''
+clientID = ''
+clientSecret = ''
 redirect_uri = 'http://localhost:8888/callback'
 scope = "user-read-currently-playing"
 
