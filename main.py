@@ -20,6 +20,8 @@ def run(windowed=False):
     flags = 0 if windowed else pygame.FULLSCREEN
     screen = pygame.display.set_mode((1080, 1080), flags)
     pygame.display.set_caption("Spotify Record Spinner")
+    # Hide mouse cursor (useful on touchscreens)
+    pygame.mouse.set_visible(False)
 
     # -------------------------------
     # Load & scale images (resources relative to script location)
