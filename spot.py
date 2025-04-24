@@ -68,14 +68,6 @@ if not all([clientID, clientSecret, username]):
 
 def get_current_playing_info():
     global spotify
-    # username = 'kcoda36'
-    # clientID = 'c0e306fda7564575b2b8173ad25de008'
-    # clientSecret = '0931a81a50244acf8aa230ff2d968b3e'
-    # redirect_uri = 'http://localhost:8888/callback'
-    # scope = "user-read-currently-playing"
-    # oauth_object = SpotifyOAuth(clientID, clientSecret, redirect_uri, scope=scope, username=username)
-    # token_info = oauth_object.get_access_token()
-    # spotify = spotipy.Spotify(auth=token_info['access_token'])
     
     current_track = spotify.current_user_playing_track()
     if current_track is None:

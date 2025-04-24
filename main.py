@@ -5,6 +5,7 @@ import sys
 import requests
 import time
 import math
+import threading
 from io import BytesIO
 from spot import get_current_playing_info, start_music, stop_music, skip_to_next, skip_to_previous
 import argparse
@@ -58,9 +59,32 @@ def run(windowed=False):
     is_playing = True
     dragging = False
     last_mouse_pos = None
-    last_check = 0
     details = None
     album_img = None
+
+    # Helper to fetch and update track details and album image
+    def update_details():
+        nonlocal details, album_img
+        new_details = get_current_playing_info()
+        if new_details:
+            details = new_details
+            try:
+                r = requests.get(details["album_cover"])
+                img = pygame.image.load(BytesIO(r.content))
+                album_img = pygame.transform.scale(img, (137, 137))
+            except Exception:
+                pass
+
+    # Initial fetch of details
+    update_details()
+
+    # Background thread to periodically update details
+    def details_thread():
+        while True:
+            time.sleep(5)
+            update_details()
+
+    threading.Thread(target=details_thread, daemon=True).start()
 
     # Swipe detection
     swipe_start_pos = None
@@ -69,14 +93,6 @@ def run(windowed=False):
     SWIPE_TIME  = 0.5    
 
     while True:
-        # Fetch Spotify info every 5 seconds
-        if time.time() - last_check > 5:
-            details = get_current_playing_info()
-            last_check = time.time()
-            if details:
-                r = requests.get(details["album_cover"])
-                album_img = pygame.image.load(BytesIO(r.content))
-                album_img = pygame.transform.scale(album_img, (137, 137))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -118,11 +134,8 @@ def run(windowed=False):
                 # Previous track
                 if prev_x <= mx <= prev_x + prev_w and prev_y <= my <= prev_y + prev_h:
                     skip_to_previous()
-                    details = get_current_playing_info(); last_check = time.time()
-                    if details:
-                        r = requests.get(details["album_cover"])
-                        album_img = pygame.image.load(BytesIO(r.content))
-                        album_img = pygame.transform.scale(album_img, (137, 137))
+                    # Fetch new track details asynchronously
+                    threading.Thread(target=update_details, daemon=True).start()
 
                 # Play/pause toggle
                 elif pause_x <= mx <= pause_x + pause_w and pause_y <= my <= pause_y + pause_h:
@@ -141,11 +154,8 @@ def run(windowed=False):
                     new_path = random.choice(record_files)
                     record_image = pygame.image.load(new_path)
                     record_image = pygame.transform.scale(record_image, (int(1080 * 1.25), int(1080 * 1.25)))
-                    details = get_current_playing_info(); last_check = time.time()
-                    if details:
-                        r = requests.get(details["album_cover"])
-                        album_img = pygame.image.load(BytesIO(r.content))
-                        album_img = pygame.transform.scale(album_img, (137, 137))
+                    # Fetch new track details asynchronously
+                    threading.Thread(target=update_details, daemon=True).start()
 
                 # Otherwise, start dragging if click on record
                 else:
