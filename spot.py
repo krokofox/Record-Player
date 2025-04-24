@@ -1,19 +1,68 @@
-import json 
-import spotipy 
+import os
+from pathlib import Path
+import json
+import spotipy
 import webbrowser
 from spotipy.oauth2 import SpotifyOAuth
+import tkinter as tk
+from tkinter import simpledialog
 
+# Load environment variables from a .env file if present
+def load_env_file(env_path='.env'):
+    env_file = Path(env_path)
+    if env_file.is_file():
+        for line in env_file.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith('#') or '=' not in line:
+                continue
+            key, val = line.split('=', 1)
+            key = key.strip()
+            val = val.strip().strip('"').strip("'")
+            # Only set if not already in environment
+            if key and val and key not in os.environ:
+                os.environ[key] = val
 
-# oauth_object = spotipy.SpotifyOAuth(clientID, clientSecret, redirect_uri) 
-# token_dict = oauth_object.get_access_token() 
-# token = token_dict['access_token'] 
-# spotifyObject = spotipy.Spotify(auth=token) 
-# user_name = spotifyObject.current_user() 
-username = ''
-clientID = ''
-clientSecret = ''
-redirect_uri = 'http://localhost:8888/callback'
-scope = "user-read-currently-playing"
+load_env_file()
+
+# Read credentials from environment variables
+clientID = os.getenv("SPOTIFY_CLIENT_ID")
+clientSecret = os.getenv("SPOTIFY_CLIENT_SECRET")
+username = os.getenv("SPOTIFY_USERNAME")
+# Optional settings
+redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI", "http://localhost:8888/callback")
+scope = os.getenv("SPOTIFY_SCOPE", "user-read-currently-playing")
+
+# Prompt for missing credentials
+if not all([clientID, clientSecret, username]):
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes('-topmost', True)
+    if not clientID:
+        clientID = simpledialog.askstring("Spotify Credentials", "Enter your Spotify Client ID:", parent=root)
+    if not clientSecret:
+        clientSecret = simpledialog.askstring("Spotify Credentials", "Enter your Spotify Client Secret:", parent=root)
+    if not username:
+        username = simpledialog.askstring("Spotify Credentials", "Enter your Spotify Username:", parent=root)
+    root.destroy()
+    # Ensure all credentials are provided
+    if not all([clientID, clientSecret, username]):
+        raise RuntimeError("Spotify credentials are required to run this application.")
+    # Persist to environment
+    os.environ["SPOTIFY_CLIENT_ID"] = clientID
+    os.environ["SPOTIFY_CLIENT_SECRET"] = clientSecret
+    os.environ["SPOTIFY_USERNAME"] = username
+    os.environ["SPOTIFY_REDIRECT_URI"] = redirect_uri
+    # Save to .env for future runs
+    try:
+        env_lines = [
+            f"SPOTIFY_CLIENT_ID={clientID}",
+            f"SPOTIFY_CLIENT_SECRET={clientSecret}",
+            f"SPOTIFY_USERNAME={username}",
+            f"SPOTIFY_REDIRECT_URI={redirect_uri}",
+        ]
+        Path('.env').write_text("\n".join(env_lines) + "\n")
+    except Exception:
+        pass
 
 
 

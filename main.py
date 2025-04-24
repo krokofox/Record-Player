@@ -7,12 +7,14 @@ import time
 import math
 from io import BytesIO
 from spot import get_current_playing_info, start_music, stop_music, skip_to_next, skip_to_previous
+import argparse
 
-def run():
+def run(windowed=False):
     # Initialize Pygame and audio mixer
     pygame.init()
     pygame.mixer.init()
-    screen = pygame.display.set_mode((1080, 1080), pygame.FULLSCREEN)
+    flags = 0 if windowed else pygame.FULLSCREEN
+    screen = pygame.display.set_mode((1080, 1080), flags)
     pygame.display.set_caption("Spotify Record Spinner")
 
     # -------------------------------
@@ -230,4 +232,7 @@ def run():
         pygame.display.flip()
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description="Spotify Record Player")
+    parser.add_argument('--windowed', action='store_true', help='Run in windowed mode (no fullscreen)')
+    args = parser.parse_args()
+    run(windowed=args.windowed)
