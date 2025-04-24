@@ -1,7 +1,5 @@
 # Record-Player
 
-![Record Player Banner](spotify/banner.png)
-
 ## Overview
 
 This project provides a fun and interactive vinyl record player interface for Spotify. Spin the record, scratch for sound effects, and control playback directly from the GUI.
@@ -11,7 +9,7 @@ This project provides a fun and interactive vinyl record player interface for Sp
 For detailed instructions on assembling the physical record player enclosure, wiring diagrams, and parts list, please refer to:
 
 - Concept Bytes: https://concept-bytes.com (Search for “Spotify Record Player”)
-- Patreon: [Your Patreon Page](https://patreon.com/yourpage)
+- Patreon: https://patreon.com/ConceptBytes
 
 ## Features
 
@@ -36,25 +34,41 @@ pip install pygame requests spotipy
 
 ## Configuration
 
-1. Create a Spotify application at https://developer.spotify.com/dashboard.
-2. Obtain your **Client ID** and **Client Secret**.
-3. In `spot.py`, update the following variables:
+This application uses environment variables for Spotify authentication and settings.
+It automatically loads values from a `.env` file in the project root (if present).
+Required variables:
 
-    ```python
-    username = 'your_spotify_username'
-    clientID = 'your_client_id'
-    clientSecret = 'your_client_secret'
-    redirect_uri = 'http://localhost:8888/callback'
-    ```
+- `SPOTIFY_CLIENT_ID`: Your Spotify application Client ID.
+- `SPOTIFY_CLIENT_SECRET`: Your Spotify application Client Secret.
+- `SPOTIFY_USERNAME`: Your Spotify username.
 
-Alternatively, set the following environment variables:
+Optional variables (with defaults):
+
+- `SPOTIFY_REDIRECT_URI` (default: `http://localhost:8888/callback`)
+- `SPOTIFY_SCOPE` (default: `user-read-currently-playing`)
+
+To configure, create a `.env` file in the project root with:
 
 ```bash
-export SPOTIPY_CLIENT_ID=your_client_id
-export SPOTIPY_CLIENT_SECRET=your_client_secret
-export SPOTIPY_REDIRECT_URI=http://localhost:8888/callback
-export SPOTIPY_USERNAME=your_spotify_username
+SPOTIFY_CLIENT_ID=your_client_id
+SPOTIFY_CLIENT_SECRET=your_client_secret
+SPOTIFY_USERNAME=your_spotify_username
+SPOTIFY_REDIRECT_URI=http://localhost:8888/callback
+SPOTIFY_SCOPE=user-read-currently-playing
 ```
+
+Or export them in your shell:
+
+```bash
+export SPOTIFY_CLIENT_ID=your_client_id
+export SPOTIFY_CLIENT_SECRET=your_client_secret
+export SPOTIFY_USERNAME=your_spotify_username
+export SPOTIFY_REDIRECT_URI=http://localhost:8888/callback
+export SPOTIFY_SCOPE=user-read-currently-playing
+```
+
+On first run, if any required variables are missing, the app will prompt you to enter them,
+and save them to `.env` for future use.
 
 ## Usage
 
@@ -83,6 +97,44 @@ Press **ESC** to exit.
   - ▶/⏸ (Play/Pause)
   - ► (Next track)
 
+## Raspberry Pi Setup (Raspotify)
+
+To use this project with your Raspberry Pi as a Spotify Connect device, install Raspotify:
+
+1. Update packages and install:
+
+   ```bash
+   sudo apt update
+   sudo apt install raspotify
+   ```
+
+   Or run the official installer:
+
+   ```bash
+   curl -sL https://dtcooper.github.io/raspotify/install.sh | sh
+   ```
+
+2. (Optional) Edit the configuration at `/etc/raspotify/config` to customize:
+
+   ```bash
+   sudo nano /etc/raspotify/config
+   ```
+   For example, set:
+   ```
+   DEVICE_NAME="My Spotify Pi"
+   BITRATE="160"
+   ```
+
+3. Restart the service:
+
+   ```bash
+   sudo systemctl restart raspotify
+   ```
+
+4. In your Spotify app, select your Raspberry Pi (e.g., "raspotify") as the playback device.
+
+Now your Raspberry Pi will appear as a Spotify Connect device.
+
 ## Acknowledgments
 
-Built by Concept Bytes. Learn more at https://concept-bytes.com or support on Patreon.
+Built by Concept Bytes. Learn more at https://concept-bytes.com or support on Patreon at https://patreon.com/ConceptBytes.
