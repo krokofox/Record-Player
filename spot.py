@@ -9,18 +9,31 @@ from tkinter import simpledialog
 
 # Load environment variables from a .env file if present
 def load_env_file(env_path='.env'):
-    env_file = Path(env_path)
-    if env_file.is_file():
-        for line in env_file.read_text().splitlines():
-            line = line.strip()
-            if not line or line.startswith('#') or '=' not in line:
-                continue
-            key, val = line.split('=', 1)
-            key = key.strip()
-            val = val.strip().strip('"').strip("'")
-            # Only set if not already in environment
-            if key and val and key not in os.environ:
-                os.environ[key] = val
+    """
+    Load environment variables from a .env file if present.
+    Searches first in the current working directory, then beside this script.
+    """
+    cwd_path = Path(env_path)
+    script_path = Path(__file__).resolve().parent / env_path
+    if cwd_path.is_file():
+        env_file = cwd_path
+    elif script_path.is_file():
+        env_file = script_path
+    else:
+        return
+    # Read and parse lines
+    content = env_file.read_text()
+    for line in content.splitlines():
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, val = line.split('=', 1)
+        key = key.strip()
+        # Strip quotes from value
+        val = val.strip().strip('"').strip("'")
+        # Only set if not already in environment
+        if key and val and key not in os.environ:
+            os.environ[key] = val
 
 load_env_file()
 
