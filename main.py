@@ -9,6 +9,9 @@ import threading
 from io import BytesIO
 from spot import get_current_playing_info, start_music, stop_music, skip_to_next, skip_to_previous
 import argparse
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 def run(windowed=False):
     # Initialize Pygame and audio mixer
@@ -19,36 +22,29 @@ def run(windowed=False):
     pygame.display.set_caption("Spotify Record Spinner")
 
     # -------------------------------
-    # Load & scale images
+    # Load & scale images (resources relative to script location)
     # -------------------------------
-    record_dir = './records'
-    record_files = [
-        os.path.join(record_dir, f)
-        for f in os.listdir(record_dir)
-        if os.path.isfile(os.path.join(record_dir, f))
-    ]
+    record_dir = BASE_DIR / 'records'
+    record_files = [p for p in record_dir.iterdir() if p.is_file()]
     random_record_path = random.choice(record_files)
-    record_image = pygame.image.load(random_record_path)
+    record_image = pygame.image.load(str(random_record_path))
     record_image = pygame.transform.scale(record_image, (int(1080 * 1.25), int(1080 * 1.25)))
 
-    play_btn  = pygame.image.load('./spotify/play.png')
-    pause_btn = pygame.image.load('./spotify/pause.png')
-    skip_btn  = pygame.image.load('./spotify/skip.png')
-    prev_btn  = pygame.image.load('./spotify/previous.png')
-    banner    = pygame.image.load('./spotify/banner.png')
+    icons_dir = BASE_DIR / 'spotify'
+    play_btn  = pygame.image.load(str(icons_dir / 'play.png'))
+    pause_btn = pygame.image.load(str(icons_dir / 'pause.png'))
+    skip_btn  = pygame.image.load(str(icons_dir / 'skip.png'))
+    prev_btn  = pygame.image.load(str(icons_dir / 'previous.png'))
+    banner    = pygame.image.load(str(icons_dir / 'banner.png'))
 
     font = pygame.font.Font(None, 40)
 
     # -------------------------------
     # Load scratch sound effects
     # -------------------------------
-    sfx_dir = './sfx'
-    sfx_paths = [
-        os.path.join(sfx_dir, fn)
-        for fn in os.listdir(sfx_dir)
-        if fn.lower().endswith('.wav')
-    ]
-    scratch_sounds = [pygame.mixer.Sound(path) for path in sfx_paths]
+    sfx_dir = BASE_DIR / 'sfx'
+    sfx_paths = [p for p in sfx_dir.iterdir() if p.is_file() and p.suffix.lower() == '.wav']
+    scratch_sounds = [pygame.mixer.Sound(str(path)) for path in sfx_paths]
 
     # -------------------------------
     # State variables
@@ -152,7 +148,7 @@ def run(windowed=False):
                 elif skip_x <= mx <= skip_x + skip_w and skip_y <= my <= skip_y + skip_h:
                     skip_to_next()
                     new_path = random.choice(record_files)
-                    record_image = pygame.image.load(new_path)
+                    record_image = pygame.image.load(str(new_path))
                     record_image = pygame.transform.scale(record_image, (int(1080 * 1.25), int(1080 * 1.25)))
                     # Fetch new track details asynchronously
                     threading.Thread(target=update_details, daemon=True).start()
