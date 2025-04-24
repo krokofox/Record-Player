@@ -63,15 +63,19 @@ def run(windowed=False):
     # Helper to fetch and update track details and album image
     def update_details():
         nonlocal details, album_img
-        new_details = get_current_playing_info()
+        try:
+            new_details = get_current_playing_info()
+        except Exception as e:
+            print(f"Error fetching current playing info: {e}", file=sys.stderr)
+            return
         if new_details:
             details = new_details
             try:
                 r = requests.get(details["album_cover"])
                 img = pygame.image.load(BytesIO(r.content))
                 album_img = pygame.transform.scale(img, (137, 137))
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Error loading album cover: {e}", file=sys.stderr)
 
     # Initial fetch of details
     update_details()
@@ -80,7 +84,10 @@ def run(windowed=False):
     def details_thread():
         while True:
             time.sleep(5)
-            update_details()
+            try:
+                update_details()
+            except Exception as e:
+                print(f"Error in details_thread: {e}", file=sys.stderr)
 
     threading.Thread(target=details_thread, daemon=True).start()
 
@@ -131,29 +138,43 @@ def run(windowed=False):
 
                 # Previous track
                 if prev_x <= mx <= prev_x + prev_w and prev_y <= my <= prev_y + prev_h:
-                    skip_to_previous()
-                    # Fetch new track details asynchronously
-                    threading.Thread(target=update_details, daemon=True).start()
+                    try:
+                        skip_to_previous()
+                    except Exception as e:
+                        print(f"Error skipping to previous track: {e}", file=sys.stderr)
+                    else:
+                        threading.Thread(target=update_details, daemon=True).start()
 
                 # Play/pause toggle
                 elif pause_x <= mx <= pause_x + pause_w and pause_y <= my <= pause_y + pause_h:
                     if is_playing:
-                        stop_music()
-                        is_playing = False
-                        angle_speed = 0
+                        try:
+                            stop_music()
+                        except Exception as e:
+                            print(f"Error stopping music: {e}", file=sys.stderr)
+                        else:
+                            is_playing = False
+                            angle_speed = 0
                     else:
-                        start_music()
-                        is_playing = True
-                        angle_speed = -0.5
+                        try:
+                            start_music()
+                        except Exception as e:
+                            print(f"Error starting music: {e}", file=sys.stderr)
+                        else:
+                            is_playing = True
+                            angle_speed = -0.5
 
                 # Next track & load new record art
                 elif skip_x <= mx <= skip_x + skip_w and skip_y <= my <= skip_y + skip_h:
-                    skip_to_next()
-                    new_path = random.choice(record_files)
-                    record_image = pygame.image.load(str(new_path))
-                    record_image = pygame.transform.scale(record_image, (int(1080 * 1.25), int(1080 * 1.25)))
-                    # Fetch new track details asynchronously
-                    threading.Thread(target=update_details, daemon=True).start()
+                    try:
+                        skip_to_next()
+                    except Exception as e:
+                        print(f"Error skipping to next track: {e}", file=sys.stderr)
+                    else:
+                        new_path = random.choice(record_files)
+                        record_image = pygame.image.load(str(new_path))
+                        record_image = pygame.transform.scale(record_image, (int(1080 * 1.25), int(1080 * 1.25)))
+                        threading.Thread(target=update_details, daemon=True).start()
 
                 # Otherwise, start dragging if click on record
                 else:
