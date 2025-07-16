@@ -1,9 +1,9 @@
 # Record-Player
 
-## Changes by Me
+## Changes by Me (KroKoFox)
 
 Hi, I'm new to GitHub, so please forgive me if I do anything wrong. After having major issues with the Scratch sound, which was monopolizing the sound card,
-I decided to remove this feature. While I was at it, I also changed the design. Best regards
+I decided to remove this feature. While I was at it, I also changed the design to what i like. (spinning Cover Art) Enjoy... Best regards
 
 ## Overview
 
