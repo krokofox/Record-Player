@@ -96,7 +96,7 @@ Press **ESC** to exit.
 ## Controls
 
 - Click and drag on the vinyl record to spin manually.
-- Swipe on the record for a scratch effect.
+- Swipe on the record for a scratch effect. (no more sound!)
 - Click the on-screen buttons:
   - ◄ (Previous track)
   - ▶/⏸ (Play/Pause)
