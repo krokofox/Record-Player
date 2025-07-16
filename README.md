@@ -18,9 +18,8 @@ For detailed instructions on assembling the physical record player enclosure, wi
 
 ## Features
 
-- Real-time display of currently playing track, artist, and album art
+- Real-time display of currently playing track, artist, and album art (spinning)
 - Vinyl record spin animation with realistic speed
-- Scratch sound effects via swipe gesture
 - Playback controls: play/pause, skip forward, skip back
 - Random vinyl artwork selection from the `records/` directory
 
