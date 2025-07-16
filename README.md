@@ -1,5 +1,10 @@
 # Record-Player
 
+## Changes by Me
+
+Hi, I'm new to GitHub, so please forgive me if I do anything wrong. After having major issues with the Scratch sound, which was monopolizing the sound card,
+I decided to remove this feature. While I was at it, I also changed the design. Best regards
+
 ## Overview
 
 This project provides a fun and interactive vinyl record player interface for Spotify. Spin the record, scratch for sound effects, and control playback directly from the GUI.
